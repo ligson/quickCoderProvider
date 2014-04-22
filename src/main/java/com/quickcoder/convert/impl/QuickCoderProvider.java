@@ -32,7 +32,7 @@ import com.boful.convert.utils.MediaInfoUtils;
 import com.boful.convert.utils.OpenOfficeTools;
 import com.boful.convert.utils.SwfTools;
 
-public class QuickCoderProvider extends ConvertProvider implements GearmanJobEventCallback<String>{
+public class QuickCoderProvider extends ConvertProvider{
 	private static Logger logger = Logger.getLogger(QuickCoderProvider.class);
 	private String mediaInfoPath;
 	private String ffmpegPath;
@@ -41,18 +41,6 @@ public class QuickCoderProvider extends ConvertProvider implements GearmanJobEve
 	private String openOfficeHome;
 	private String pdf2swfPath;
 	private String mencoderPath;
-	private static GearmanClient client;
-	private static Gearman gearman;
-	private static String transcodeIp;
-	private static int transcodePort;
-	private static String memIp;
-	private static int memPort;
-	private static String uploadIp;
-	private static int uploadPort;
-	private static String uploadUser;
-	private static String uploadPass;
-	private static String tempPath;
-	private static String svrAddress;
 	public String getMediaInfoPath() {
 		return mediaInfoPath;
 	}
@@ -101,7 +89,6 @@ public class QuickCoderProvider extends ConvertProvider implements GearmanJobEve
 		super(config);
 		try {
 			voluation(config.getHosts().get(0).getParams());
-			init();
 		} catch (Exception e) {
 			logger.error("params复制错误，可能参数不正确：", e);
 		}
@@ -110,7 +97,6 @@ public class QuickCoderProvider extends ConvertProvider implements GearmanJobEve
 			int port, Map<String, String> params) throws Exception {
 		super(name, description, ip, port, params);
 		voluation(params);
-		init();
 	}
 	/**
 	 * 为BofulConvertProvider对象赋值
@@ -139,36 +125,7 @@ public class QuickCoderProvider extends ConvertProvider implements GearmanJobEve
 		}
 
 	}
-	public void init(){
-		URL url=Thread.currentThread().getContextClassLoader().getResource("Transcode.properties");
-		InputStream is = null;
-		try {
-			is = new FileInputStream(url.getFile());
-			Properties p=new Properties();
-			p.load(is);
-			transcodeIp= p.getProperty("transcode.ip");
-			transcodePort=Integer.parseInt(p.getProperty("transcode.port"));
-			memIp=p.getProperty("memcached.ip");
-			memPort=Integer.parseInt(p.getProperty("memcached.port"));
-			uploadIp=p.getProperty("upload.ip");
-			uploadPort=Integer.parseInt(p.getProperty("upload.port"));
-			uploadUser=p.getProperty("upload.user");
-			uploadPass=p.getProperty("upload.pass");
-			tempPath=p.getProperty("transcode.tempPath");
-			svrAddress=p.getProperty("transcode.svrAddress");
-			Gearman gearman = Gearman.createGearman();
-			client = gearman.createGearmanClient();
-			GearmanServer server = gearman.createGearmanServer(transcodeIp, transcodePort);
-			client.addServer(server);
-			String clientId = "nts_client";
-			client.setClientID(clientId);
-			logger.debug("clientId: " + clientId);
-			System.out.println("转码服务器启动成功!");
-			logger.debug("转码服务器启动成功!");
-		} catch (Exception e) {
-			logger.debug("转码服务器启动失败!原因: "+e.getMessage());
-		}
-	}
+	
 	@Override
 	public long getLogicLength(DiskFile diskFile) {
 		if(diskFile.isVideo()){
@@ -269,99 +226,26 @@ public class QuickCoderProvider extends ConvertProvider implements GearmanJobEve
 			}
 		}
 	}
-	@Override
-	public void transcodeVideo(DiskFile diskFile, DiskFile destFile,
+
+	public void transcodeVideo(DiskFile diskFile, DiskFile destFile, int width,
 			TranscodeEvent transcodeEvent) {
-		super.transcodeVideo(diskFile, destFile, transcodeEvent);
+			try {
+				GearmanConvert convert =new GearmanConvert();
+				convert.gearmanTranscode(diskFile,destFile,0,0);
+			} catch (Exception e) {
+				logger.debug(e.getMessage());
+			}
 	}
 	@Override
 	public void transcodeVideo(DiskFile diskFile, DiskFile destFile, int width,
 			int height, int videoBitrate, int audioBitrate,
 			TranscodeEvent transcodeEvent) {
-		VideoConvert videoConvert = new VideoConvert();
-		videoConvert.setFfmpegPath(ffmpegPath);
-		videoConvert.setMediaInfoPath(mediaInfoPath);
-		videoConvert.setMencoderPath(mencoderPath);
-
-		videoConvert.convert(diskFile, destFile, width, height, videoBitrate,
-				audioBitrate, transcodeEvent);
-	}
-	public void shutdown(){
-		if(gearman != null){
-				gearman.shutdown();
-		}	
-	}
-	public void start(final String cmd,final String jobId){
-		final QuickCoderProvider quickCoderProvider = this;
-		Thread thread = new Thread(new Runnable() {
-			public void run() {
-				String workName = "worker_convert";
-				try {
-					GearmanJoin<String> join = client.submitJob(workName,cmd.toString().getBytes("GBK"), jobId.getBytes(),jobId,quickCoderProvider);
-					System.out.println("workName :"+workName);
-					join.join();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
+			try {
+				GearmanConvert convert =new GearmanConvert();
+				convert.gearmanTranscode(diskFile,destFile,width,height);
+			} catch (Exception e) {
+				logger.debug(e.getMessage());
 			}
-		});
-		thread.start();
 	}
-	public void startJob(String filePath){
-		try {
-			gearmanTranscode(filePath);
-		} catch (Exception e) {
-			logger.debug(e.getMessage());
-		}
-	}
-	public void gearmanTranscode(String filePath) throws Exception{
-		System.out.println("filePath :"+filePath);
-		String jobId = UUID.randomUUID().toString();
-		StringBuffer cmd = new StringBuffer();
-		if(svrAddress!=""&&svrAddress!="127.0.0.1"&&svrAddress!="localhost"){
-			cmd.append("-i bmsp://ADDR="+svrAddress+":1680;FILE="+svrAddress+";PFG=2; ");
-			cmd.append("-o "+tempPath+"/"+FileUtils.getFilePrefix(new File(filePath).getName())+"_cq.mp4 ");
-			cmd.append("-path "+new File(filePath).getParentFile().getAbsolutePath()+" ");
-		}else {
-			cmd.append("-i "+filePath+" ");
-			File destFile= new File(filePath+"_cq.mp4");
-			cmd.append("-o "+destFile.getAbsolutePath()+" ");
-			cmd.append("-path "+new File(filePath).getParentFile().getAbsolutePath()+" ");
-		}
-		cmd.append("-guid "+jobId+" ");
-		cmd.append("-memserver "+memIp+":"+memPort+" ");
-		cmd.append("-addr "+uploadIp+" -port "+uploadPort+" ");
-		cmd.append("-user "+uploadUser+" -pass "+uploadPass+" ");
-		cmd.append("-head ");
-		System.out.println(cmd);
-		start(cmd.toString(), jobId);
-	}
-	@Override
-	public void onEvent(String str, GearmanJobEvent event) {
-		System.out.println(new String(str) + ":");
-        displayEvent(str, event);
-	}
-	public static void displayEvent(String str, GearmanJobEvent event){
-		GearmanJobEventType eventType =  event.getEventType();
-		if(eventType==GearmanJobEventType.GEARMAN_JOB_SUCCESS){
-			System.out.println("GEARMAN_JOB_SUCCESS");
-		}else if(eventType==GearmanJobEventType.GEARMAN_SUBMIT_FAIL){
-			System.out.println("GEARMAN_SUBMIT_FAIL");
-		}else if(eventType==GearmanJobEventType.GEARMAN_JOB_FAIL){
-			System.out.println("GEARMAN_JOB_FAIL");
-		}else if(eventType==GearmanJobEventType.GEARMAN_JOB_DATA){
-			System.out.println("GEARMAN_JOB_DATA");
-		}else if (eventType==GearmanJobEventType.GEARMAN_JOB_WARNING) {
-			System.out.println("GEARMAN_JOB_WARNING");
-		}else if (eventType==GearmanJobEventType.GEARMAN_JOB_STATUS) {
-			System.out.println("GEARMAN_JOB_STATUS");
-		}else if (eventType==GearmanJobEventType.GEARMAN_SUBMIT_SUCCESS) {
-			System.out.println("GEARMAN_SUBMIT_SUCCESS");
-		}else if (eventType==GearmanJobEventType.GEARMAN_EOF) {
-			System.out.println("GEARMAN_EOF");
-		}else {
-			System.out.println(new String(event.getData()));
-		}
-	}
-
+	
 }
