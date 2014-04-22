@@ -227,14 +227,9 @@ public class QuickCoderProvider extends ConvertProvider{
 		}
 	}
 
-	public void transcodeVideo(DiskFile diskFile, DiskFile destFile, int width,
+	public void transcodeVideo(DiskFile diskFile, DiskFile destFile,
 			TranscodeEvent transcodeEvent) {
-			try {
-				GearmanConvert convert =new GearmanConvert();
-				convert.gearmanTranscode(diskFile,destFile,0,0);
-			} catch (Exception e) {
-				logger.debug(e.getMessage());
-			}
+		super.transcodeVideo(diskFile, destFile, transcodeEvent);
 	}
 	@Override
 	public void transcodeVideo(DiskFile diskFile, DiskFile destFile, int width,
