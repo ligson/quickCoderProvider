@@ -50,10 +50,10 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			  <groupId>org.gearman.service</groupId>
-			  <artifactId>gearman-service</artifactId>
-			  <version>0.7.0</version>
-			  <classifier>uniqueID</classifier>
+			<groupId>org.gearman.service</groupId>
+			<artifactId>gearman-service</artifactId>
+			<version>0.7.0</version>
+			<classifier>uniqueID</classifier>
 		</dependency>
 		<dependency>
 			<groupId>log4j</groupId>
@@ -65,24 +65,24 @@
 			<artifactId>slf4j-api</artifactId>
 			<version>1.7.6</version>
 		</dependency>
-         <dependency>
+		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-jdk14</artifactId>
 			<version>1.7.7</version>
 		</dependency>
-                   
+
 		<dependency>
 			<groupId>com.boful</groupId>
 			<artifactId>boful-common</artifactId>
 			<version>1.0</version>
 			<scope>jar</scope>
 		</dependency>
-	
-        <dependency>
+
+		<dependency>
 			<groupId>com.eaio.uuid</groupId>
 			<artifactId>uuid</artifactId>
 			<version>3.2</version>
-		</dependency>    
+		</dependency>
 		<dependency>
 			<groupId>org.apache.pdfbox</groupId>
 			<artifactId>pdfbox</artifactId>
@@ -126,5 +126,19 @@
 			<version>3.0</version>
 			<scope>provided</scope>
 		</dependency>
+
+		<dependency>
+			<groupId>dom4j</groupId>
+			<artifactId>dom4j</artifactId>
+			<version>1.6.1</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>commons-codec</groupId>
+			<artifactId>commons-codec</artifactId>
+			<version>1.8</version>
+			<scope>provided</scope>
+		</dependency>
+
 	</dependencies>
 </project>
