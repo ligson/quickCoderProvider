@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 import java.util.UUID;
 
@@ -17,45 +19,67 @@ import org.gearman.GearmanJoin;
 import org.gearman.GearmanServer;
 
 import com.boful.common.file.utils.FileUtils;
+import com.boful.convert.core.ConvertProviderConfig;
+import com.boful.convert.core.TranscodeEvent;
 import com.boful.convert.model.DiskFile;
 
-public class GearmanConvert implements GearmanJobEventCallback<String>{
+/***
+ * 
+ * @author lvy6
+ * 
+ */
+public class GearmanConvert implements GearmanJobEventCallback<String> {
+
+	/***
+	 * 
+	 */
 	private static Logger logger = Logger.getLogger(GearmanConvert.class);
 	private static GearmanClient client;
 	private static Gearman gearman;
-	private static String transcodeIp;
-	private static int transcodePort;
-	private static String memIp;
-	private static int memPort;
-	private static String uploadIp;
-	private static int uploadPort;
-	private static String uploadUser;
-	private static String uploadPass;
-	private static String tempPath;
-	private static String svrAddress;
+	private String ftpUserName;
+	private String ftpUserPassword;
+	private String ftpUserHome;
+	private String ftpHost;
+	private int ftpPort;
+	private String transcodeSvrAddress;
+	private int transcodeSvrPort;
+	private String memcachedAddress;
+	private int memcachedPort;
+	private TranscodeEvent transcodeEvent;
+	
+	private Map<String, String> jobMap = new HashMap<String,String>();
+
 	public GearmanConvert() {
-		init();
+		// TODO Auto-generated constructor stub
 	}
-	public void init(){
-		URL url=Thread.currentThread().getContextClassLoader().getResource("Transcode.properties");
-		InputStream is = null;
+
+	GearmanConvert(QuickCoderProvider quickCoderProvider,TranscodeEvent transcodeEvent) {
+		this.transcodeEvent = transcodeEvent;
+		init(quickCoderProvider);
+	}
+
+	/***
+	 * 为GearmanConvert对象赋值,并启动转码服务器
+	 * 
+	 * @param quickCoderProvider
+	 *            实体类
+	 */
+	public void init(QuickCoderProvider quickCoderProvider) {
+		// 初始化赋值
+		transcodeSvrAddress = quickCoderProvider.getTranscodeSvrAddress();
+		transcodeSvrPort = quickCoderProvider.getTranscodeSvrPort();
+		ftpUserName = quickCoderProvider.getFtpUserName();
+		ftpUserPassword = quickCoderProvider.getFtpUserPassword();
+		ftpUserHome = quickCoderProvider.getFtpUserHome();
+		ftpPort = quickCoderProvider.getFtpPort();
+		ftpHost = quickCoderProvider.getFtpHost();
+		memcachedAddress = quickCoderProvider.getMemcachedAddress();
+		memcachedPort = quickCoderProvider.getMemcachedPort();
 		try {
-			is = new FileInputStream(url.getFile());
-			Properties p=new Properties();
-			p.load(is);
-			transcodeIp= p.getProperty("transcode.ip");
-			transcodePort=Integer.parseInt(p.getProperty("transcode.port"));
-			memIp=p.getProperty("memcached.ip");
-			memPort=Integer.parseInt(p.getProperty("memcached.port"));
-			uploadIp=p.getProperty("upload.ip");
-			uploadPort=Integer.parseInt(p.getProperty("upload.port"));
-			uploadUser=p.getProperty("upload.user");
-			uploadPass=p.getProperty("upload.pass");
-			tempPath=p.getProperty("transcode.tempPath");
-			svrAddress=p.getProperty("transcode.svrAddress");
-			Gearman gearman = Gearman.createGearman();
+			gearman = Gearman.createGearman();
 			client = gearman.createGearmanClient();
-			GearmanServer server = gearman.createGearmanServer(transcodeIp, transcodePort);
+			GearmanServer server = gearman.createGearmanServer(
+					transcodeSvrAddress, transcodeSvrPort);
 			client.addServer(server);
 			String clientId = "nts_client";
 			client.setClientID(clientId);
@@ -63,17 +87,27 @@ public class GearmanConvert implements GearmanJobEventCallback<String>{
 			System.out.println("转码服务器启动成功!");
 			logger.debug("转码服务器启动成功!");
 		} catch (Exception e) {
-			logger.debug("转码服务器启动失败!原因: "+e.getMessage());
+			logger.debug("转码服务器启动失败!原因: " + e.getMessage());
 		}
 	}
-	private void start(final String cmd,final String jobId){
+
+	/***
+	 * 加入转码任务
+	 * s
+	 * @param cmd
+	 *            转码命令
+	 * @param jobId
+	 */
+	private void start(final String cmd, final String jobId) {
 		final GearmanConvert gearmanConvert = this;
 		Thread thread = new Thread(new Runnable() {
 			public void run() {
 				String workName = "worker_convert";
 				try {
-					GearmanJoin<String> join = client.submitJob(workName,cmd.toString().getBytes("GBK"), jobId.getBytes(),jobId,gearmanConvert);
-					System.out.println("workName :"+workName);
+					GearmanJoin<String> join = client.submitJob(workName, cmd
+							.toString().getBytes("GBK"), jobId.getBytes(),
+							jobId, gearmanConvert);
+					System.out.println("workName :" + workName);
 					join.join();
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -82,71 +116,127 @@ public class GearmanConvert implements GearmanJobEventCallback<String>{
 		});
 		thread.start();
 	}
-	public void shutdown(){
-		if(gearman != null){
-				gearman.shutdown();
-		}	
+
+	public static void shutdown() {
+		if (gearman != null) {
+			gearman.shutdown();
+		}
 	}
-	public void gearmanTranscode(DiskFile diskFile, DiskFile destFile, int width,int height) throws Exception{
-		String filePath=diskFile.getAbsolutePath();
-		System.out.println("filePath :"+diskFile.getAbsolutePath());
+
+	/***
+	 * 转码命令封装
+	 * 
+	 * @param diskFile
+	 *            转码文件
+	 * @param destFile
+	 *            输出文件
+	 * @param width
+	 * @param height
+	 * @param videoBitrate
+	 *            视频码率
+	 * @param audioBitrate
+	 *            音频码率
+	 * @param transcodeEvent
+	 *            转码事件
+	 * @throws Exception
+	 */
+	void gearmanTranscode(DiskFile diskFile, DiskFile destFile,
+			int width, int height, int videoBitrate, int audioBitrate
+			) throws Exception {
 		String jobId = UUID.randomUUID().toString();
+		String filePath =diskFile.getAbsolutePath();
+		jobMap.put(jobId, filePath);
 		StringBuffer cmd = new StringBuffer();
-		if(svrAddress!=""&&svrAddress!="127.0.0.1"&&svrAddress!="localhost"){
-			cmd.append("-i bmsp://ADDR="+svrAddress+":1680;FILE="+filePath+";PFG=2; ");
-			if(destFile!=null&&destFile.exists()){
-				cmd.append("-o "+tempPath+"/"+destFile.getName()+" ");
-			}else {
-				cmd.append("-o "+tempPath+"/"+FileUtils.getFilePrefix(new File(filePath).getName())+"_cq.mp4 ");
-			}
-			cmd.append("-path "+diskFile.getParentFile().getAbsolutePath()+" ");
-		}else {
-			cmd.append("-i "+filePath+" ");
-			if(destFile!=null&&destFile.exists()){
-				cmd.append("-o "+destFile.getName()+" ");
-			}else {
-				cmd.append("-o "+new File(filePath+"_cq.mp4").getAbsolutePath()+" ");
-			}
-			cmd.append("-path "+diskFile.getParentFile().getAbsolutePath()+" ");
+		// ##############################拼接文件路径开始#################################
+		cmd.append(" -i ftp://" + ftpUserName + ":" + ftpUserPassword + "@"
+				+ ftpHost + ":" + ftpPort);
+		// 判断传递过来的文件是否以"ftpUserHome"属性值开头
+		if (diskFile.getParentFile().getAbsolutePath().startsWith(ftpUserHome)) {
+			cmd.append(diskFile.getAbsolutePath());
+		} else {
+			String subName = diskFile.getAbsolutePath().substring(
+					diskFile.getParentFile().getAbsolutePath().length(),
+					diskFile.getAbsolutePath().length());
+			cmd.append(ftpUserHome + subName);
 		}
-		cmd.append("-guid "+jobId+" ");
-		cmd.append("-memserver "+memIp+":"+memPort+" ");
-		cmd.append("-addr "+uploadIp+" -port "+uploadPort+" ");
-		cmd.append("-user "+uploadUser+" -pass "+uploadPass+" ");
-		if(width!=0){
-			cmd.append("-w "+width+" ");
+		// ##############################拼接文件路径结束#################################
+		// ##############################拼接输出路径开始#################################
+		cmd.append(" -o ftp://" + ftpUserName + ":" + ftpUserPassword + "@"
+				+ ftpHost + ":" + ftpPort);
+		// 判断传递过来的文件是否以"ftpUserHome"属性值开头
+		if (destFile.getParentFile().getAbsolutePath().startsWith(ftpUserHome)) {
+			cmd.append(destFile.getAbsolutePath());
+		} else {
+			String subName = destFile.getAbsolutePath().substring(
+					destFile.getParentFile().getAbsolutePath().length(),
+					destFile.getAbsolutePath().length());
+			// ################修改文件名称###########################
+			String newName = FileUtils.getFilePrefix(subName) + "_cp";
+			String fileType = FileUtils.getFileSufix(subName);
+			cmd.append(ftpUserHome + newName + "." + fileType);
 		}
-		if(height!=0){
-			cmd.append("-h "+height+" ");
+		// ##############################拼接输出路径结束#################################
+		cmd.append(" -guid " + jobId);
+		cmd.append(" -memserver " + memcachedAddress + ":" + memcachedPort);
+		if ((width != 0) && (height != 0) && (width != -1) && (height != -1)) {
+			cmd.append("  -w " + width);
+			cmd.append("  -h " + height);
 		}
-		cmd.append("-head ");
+		// #######################################视频码率###########################
+		if (videoBitrate != -1) {
+			Double doubleVideo = Double.parseDouble(videoBitrate + "");
+			cmd.append(" -v " + doubleVideo / 1000 + "bps");
+		}
+		// #######################################音频码率###########################
+		if (audioBitrate != -1) {
+			Double doubleAudio = Double.parseDouble(audioBitrate + "");
+			cmd.append(" -a " + doubleAudio / 1000 + "bps");
+		}
+		cmd.append(" -head ");
 		System.out.println(cmd);
 		start(cmd.toString(), jobId);
 	}
+
 	@Override
 	public void onEvent(String str, GearmanJobEvent event) {
-		System.out.println(new String(str) + ":");
-        displayEvent(str, event);
+		//System.out.println(new String(str) + ":");
+		displayEvent(str, event);
 	}
-	private static void displayEvent(String str, GearmanJobEvent event){
-		GearmanJobEventType eventType =  event.getEventType();
-		if(eventType==GearmanJobEventType.GEARMAN_JOB_SUCCESS){
-			System.out.println("GEARMAN_JOB_SUCCESS");
-		}else if(eventType==GearmanJobEventType.GEARMAN_SUBMIT_FAIL){
-			System.out.println("GEARMAN_SUBMIT_FAIL");
-		}else if(eventType==GearmanJobEventType.GEARMAN_JOB_FAIL){
-			System.out.println("GEARMAN_JOB_FAIL");
-		}else if(eventType==GearmanJobEventType.GEARMAN_JOB_DATA){
+
+	private void displayEvent(String str, GearmanJobEvent event) {
+		DiskFile diskFile = null;
+		if(jobMap.size()>0){
+			String filePath = jobMap.get(str);
+			diskFile = new DiskFile(filePath);
+		}
+		GearmanJobEventType eventType = event.getEventType();
+		if (eventType == GearmanJobEventType.GEARMAN_JOB_SUCCESS) {
+			//System.out.println("GEARMAN_JOB_SUCCESS");
+			transcodeEvent.onSubmitSuccess(diskFile);
+		} else if (eventType == GearmanJobEventType.GEARMAN_SUBMIT_FAIL) {
+			//System.out.println("GEARMAN_SUBMIT_FAIL");
+			transcodeEvent.onSubmitFail(diskFile, "GEARMAN_SUBMIT_FAIL");
+			shutdown();
+		} else if (eventType == GearmanJobEventType.GEARMAN_JOB_FAIL) {
+			//System.out.println("GEARMAN_JOB_FAIL");
+			transcodeEvent.onTranscodeFail(diskFile,"GEARMAN_JOB_FAIL");
+			shutdown();
+		} else if (eventType == GearmanJobEventType.GEARMAN_JOB_DATA) {
 			System.out.println("GEARMAN_JOB_DATA");
-		}else if (eventType==GearmanJobEventType.GEARMAN_JOB_WARNING) {
+		} else if (eventType == GearmanJobEventType.GEARMAN_JOB_WARNING) {
 			System.out.println("GEARMAN_JOB_WARNING");
-		}else if (eventType==GearmanJobEventType.GEARMAN_JOB_STATUS) {
-			System.out.println("GEARMAN_JOB_STATUS");
-		}else if (eventType==GearmanJobEventType.GEARMAN_SUBMIT_SUCCESS) {
-			System.out.println("GEARMAN_SUBMIT_SUCCESS");
-		}else if (eventType==GearmanJobEventType.GEARMAN_EOF) {
+		} else if (eventType == GearmanJobEventType.GEARMAN_JOB_STATUS) {
+			//System.out.println("GEARMAN_JOB_STATUS");
+			// #######################进度###########################
+			transcodeEvent.onTranscode(diskFile,Integer.parseInt(new String(event.getData())));
+			System.out.println(new String(event.getData()));
+		} else if (eventType == GearmanJobEventType.GEARMAN_SUBMIT_SUCCESS) {
+			//System.out.println("GEARMAN_SUBMIT_SUCCESS");
+			transcodeEvent.onSubmitSuccess(diskFile);
+		} else if (eventType == GearmanJobEventType.GEARMAN_EOF) {
 			System.out.println("GEARMAN_EOF");
-		}else {
+			shutdown();
+		} else {
 			System.out.println(new String(event.getData()));
 		}
 	}

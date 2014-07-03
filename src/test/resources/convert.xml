@@ -1,0 +1,42 @@
+<convertConfig>
+    <providers>
+        <provider>
+            <name>BofulProvider1</name>
+            <description>hello</description>
+            <hosts>
+                <host name="bf1">
+                    <ip>127.0.0.1</ip>
+                    <port>1666</port>
+                    <params>
+                        <param name="user">master</param>
+                        <param name="ffmpegPath">/home/lvy6/ffmpeg-0.7.16/ffmpeg</param>
+                        <param name="mp4BoxPath">/usr/bin/MP4Box</param>
+                        <param name="mencoderPath">/usr/bin/mencoder</param>
+                        <!--默认位置不需要配置-->
+                        <!--<param name="openOfficeHome">/opt/openoffice.org3</param>-->
+                        <param name="pdf2swfPath">/usr/local/bin/pdf2swf</param>
+                        <param name="mediaInfoPath">/usr/bin/mediainfo</param>
+                        <!--如果命令行能找到convert就不需要配置-->
+                        <param name="imageMagickSearchPath">/usr/bin</param>
+                        <!-- ftp用户名称 -->
+                        <param name="ftpUserName">ftptest</param>
+                        <!-- ftp用户密码 -->
+                        <param name="ftpUserPassword">password</param>
+                        <!-- ftp存储路径 -->
+                        <param name="ftpUserHome">/home/ftptest</param>
+                        <!-- ftp IP -->
+                        <param name="ftpHost">192.168.1.201</param>
+                        <!-- ftp 端口 -->
+                       <param name="ftpPort">21</param>
+                        <!-- 转码服务器IP -->
+                        <param name="transcodeSvrAddress">192.168.1.46</param>
+                        <!-- 转码服务器端口 -->
+                        <param name="transcodeSvrPort">4730</param>
+                        <param name="memcachedAddress">192.168.1.46</param>
+                        <param name="memcachedPort">11211</param>
+                    </params>
+                </host>
+            </hosts>
+        </provider>
+    </providers>
+</convertConfig>

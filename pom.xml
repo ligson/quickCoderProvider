@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.boful</groupId>
 	<artifactId>quickCoderProvider</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0</version>
 	<build>
 		<sourceDirectory>src/main/java</sourceDirectory>
 		<testSourceDirectory>src/test/java</testSourceDirectory>
@@ -138,6 +138,11 @@
 			<artifactId>commons-codec</artifactId>
 			<version>1.8</version>
 			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.boful</groupId>
+			<artifactId>boful-soft-convert</artifactId>
+			<version>0.0.1</version>
 		</dependency>
 
 	</dependencies>

@@ -1,26 +1,13 @@
 package com.quickcoder.convert.impl;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.net.URL;
 import java.util.Map;
-import java.util.Properties;
-import java.util.UUID;
 
 import org.apache.log4j.Logger;
 import org.artofsolving.jodconverter.office.OfficeException;
-import org.gearman.Gearman;
-import org.gearman.GearmanClient;
-import org.gearman.GearmanJobEvent;
-import org.gearman.GearmanJobEventCallback;
-import org.gearman.GearmanJobEventType;
-import org.gearman.GearmanJoin;
-import org.gearman.GearmanServer;
 
-import com.boful.common.file.utils.FileUtils;
 import com.boful.convert.core.ConvertProvider;
 import com.boful.convert.core.ConvertProviderConfig;
 import com.boful.convert.core.TranscodeEvent;
@@ -32,7 +19,7 @@ import com.boful.convert.utils.MediaInfoUtils;
 import com.boful.convert.utils.OpenOfficeTools;
 import com.boful.convert.utils.SwfTools;
 
-public class QuickCoderProvider extends ConvertProvider{
+public class QuickCoderProvider extends ConvertProvider {
 	private static Logger logger = Logger.getLogger(QuickCoderProvider.class);
 	private String mediaInfoPath;
 	private String ffmpegPath;
@@ -40,51 +27,138 @@ public class QuickCoderProvider extends ConvertProvider{
 	private String transcodeDocumentEnable;
 	private String openOfficeHome;
 	private String pdf2swfPath;
-	private String mencoderPath;
+	private String ftpUserName;
+	private String ftpUserPassword;
+	private String ftpUserHome;
+	private String ftpHost;
+	private int ftpPort;
+	private String transcodeSvrAddress;
+	private int transcodeSvrPort ;
+	private String memcachedAddress;
+	private int memcachedPort;
+	
+	
+
 	public String getMediaInfoPath() {
 		return mediaInfoPath;
 	}
+
 	public void setMediaInfoPath(String mediaInfoPath) {
 		this.mediaInfoPath = mediaInfoPath;
 	}
+
 	public String getFfmpegPath() {
 		return ffmpegPath;
 	}
+
 	public void setFfmpegPath(String ffmpegPath) {
 		this.ffmpegPath = ffmpegPath;
 	}
+
 	public String getImageMagickSearchPath() {
 		return imageMagickSearchPath;
 	}
+
 	public void setImageMagickSearchPath(String imageMagickSearchPath) {
 		this.imageMagickSearchPath = imageMagickSearchPath;
 	}
-	
+
 	public String getTranscodeDocumentEnable() {
 		return transcodeDocumentEnable;
 	}
+
 	public void setTranscodeDocumentEnable(String transcodeDocumentEnable) {
 		this.transcodeDocumentEnable = transcodeDocumentEnable;
 	}
+
 	public String getOpenOfficeHome() {
 		return openOfficeHome;
 	}
+
 	public void setOpenOfficeHome(String openOfficeHome) {
 		this.openOfficeHome = openOfficeHome;
 	}
+
 	public String getPdf2swfPath() {
 		return pdf2swfPath;
 	}
-	
-	public String getMencoderPath() {
-		return mencoderPath;
-	}
-	public void setMencoderPath(String mencoderPath) {
-		this.mencoderPath = mencoderPath;
-	}
+
 	public void setPdf2swfPath(String pdf2swfPath) {
 		this.pdf2swfPath = pdf2swfPath;
 	}
+
+	public String getFtpUserName() {
+		return ftpUserName;
+	}
+
+	public void setFtpUserName(String ftpUserName) {
+		this.ftpUserName = ftpUserName;
+	}
+
+	public String getFtpUserPassword() {
+		return ftpUserPassword;
+	}
+
+	public void setFtpUserPassword(String ftpUserPassword) {
+		this.ftpUserPassword = ftpUserPassword;
+	}
+
+	public String getFtpUserHome() {
+		return ftpUserHome;
+	}
+
+	public void setFtpUserHome(String ftpUserHome) {
+		this.ftpUserHome = ftpUserHome;
+	}
+
+	public String getFtpHost() {
+		return ftpHost;
+	}
+
+	public void setFtpHost(String ftpHost) {
+		this.ftpHost = ftpHost;
+	}
+
+	public int getFtpPort() {
+		return ftpPort;
+	}
+
+	public void setFtpPort(int ftpPort) {
+		this.ftpPort = ftpPort;
+	}
+
+	public String getTranscodeSvrAddress() {
+		return transcodeSvrAddress;
+	}
+
+	public void setTranscodeSvrAddress(String transcodeSvrAddress) {
+		this.transcodeSvrAddress = transcodeSvrAddress;
+	}
+
+	public int getTranscodeSvrPort() {
+		return transcodeSvrPort;
+	}
+
+	public void setTranscodeSvrPort(int transcodeSvrPort) {
+		this.transcodeSvrPort = transcodeSvrPort;
+	}
+
+	public String getMemcachedAddress() {
+		return memcachedAddress;
+	}
+
+	public void setMemcachedAddress(String memcachedAddress) {
+		this.memcachedAddress = memcachedAddress;
+	}
+
+	public int getMemcachedPort() {
+		return memcachedPort;
+	}
+
+	public void setMemcachedPort(int memcachedPort) {
+		this.memcachedPort = memcachedPort;
+	}
+
 	public QuickCoderProvider(ConvertProviderConfig config) {
 		super(config);
 		try {
@@ -93,11 +167,13 @@ public class QuickCoderProvider extends ConvertProvider{
 			logger.error("params复制错误，可能参数不正确：", e);
 		}
 	}
+
 	public QuickCoderProvider(String name, String description, String ip,
 			int port, Map<String, String> params) throws Exception {
 		super(name, description, ip, port, params);
 		voluation(params);
 	}
+
 	/**
 	 * 为BofulConvertProvider对象赋值
 	 * 
@@ -118,17 +194,21 @@ public class QuickCoderProvider extends ConvertProvider{
 				logger.debug(fieldName + "=" + params.get(fieldName));
 				method = cls.getDeclaredMethod(methodName, field.getType());
 				logger.debug("调用方法:" + method.getName());
-				method.invoke(this, fieldValue);
+				if(field.getType().getName().equals("int")||field.getType().getName().equals("Integer")){
+					method.invoke(this,Integer.parseInt(fieldValue));
+				}else {
+					method.invoke(this, fieldValue);
+				}				
 
 			}
 
 		}
 
 	}
-	
+
 	@Override
 	public long getLogicLength(DiskFile diskFile) {
-		if(diskFile.isVideo()){
+		if (diskFile.isVideo()) {
 			return MediaInfoUtils.getDuration(mediaInfoPath, diskFile);
 		}
 		if (diskFile.getName().endsWith("pdf")) {
@@ -231,16 +311,17 @@ public class QuickCoderProvider extends ConvertProvider{
 			TranscodeEvent transcodeEvent) {
 		super.transcodeVideo(diskFile, destFile, transcodeEvent);
 	}
+
 	@Override
 	public void transcodeVideo(DiskFile diskFile, DiskFile destFile, int width,
 			int height, int videoBitrate, int audioBitrate,
 			TranscodeEvent transcodeEvent) {
-			try {
-				GearmanConvert convert =new GearmanConvert();
-				convert.gearmanTranscode(diskFile,destFile,width,height);
-			} catch (Exception e) {
-				logger.debug(e.getMessage());
-			}
+		try {
+			GearmanConvert convert = new GearmanConvert(this,transcodeEvent);
+			convert.gearmanTranscode(diskFile, destFile, width, height,videoBitrate,audioBitrate);
+		} catch (Exception e) {
+			logger.debug(e.getMessage());
+		}
 	}
-	
+
 }
