@@ -38,8 +38,8 @@
 	</repositories>
 	<dependencies>
 		<dependency>
-			<groupId>com.boful.convert.api</groupId>
-			<artifactId>convert-api</artifactId>
+			<groupId>com.boful</groupId>
+			<artifactId>boful-convert-api</artifactId>
 			<version>0.0.1</version>
 			<scope>provided</scope>
 		</dependency>

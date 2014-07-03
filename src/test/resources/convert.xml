@@ -13,7 +13,7 @@
                         <param name="mp4BoxPath">/usr/bin/MP4Box</param>
                         <param name="mencoderPath">/usr/bin/mencoder</param>
                         <!--默认位置不需要配置-->
-                        <!--<param name="openOfficeHome">/opt/openoffice.org3</param>-->
+                        <param name="openOfficeHome">/opt/openoffice.org3</param>
                         <param name="pdf2swfPath">/usr/local/bin/pdf2swf</param>
                         <param name="mediaInfoPath">/usr/bin/mediainfo</param>
                         <!--如果命令行能找到convert就不需要配置-->

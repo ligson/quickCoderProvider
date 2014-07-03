@@ -6,18 +6,17 @@ import java.lang.reflect.Method;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.artofsolving.jodconverter.office.OfficeException;
 
 import com.boful.convert.core.ConvertProvider;
 import com.boful.convert.core.ConvertProviderConfig;
 import com.boful.convert.core.TranscodeEvent;
+import com.boful.convert.core.impl.utils.DocumentUtils;
+import com.boful.convert.core.impl.utils.FFMpegUtils;
+import com.boful.convert.core.impl.utils.ImageMagickUtils;
+import com.boful.convert.core.impl.utils.OpenOfficeTools;
+import com.boful.convert.core.impl.utils.SwfTools;
 import com.boful.convert.model.DiskFile;
-import com.boful.convert.utils.DocumentUtils;
-import com.boful.convert.utils.FFMpegUtils;
-import com.boful.convert.utils.ImageMagickUtils;
-import com.boful.convert.utils.MediaInfoUtils;
-import com.boful.convert.utils.OpenOfficeTools;
-import com.boful.convert.utils.SwfTools;
+import com.boful.convert.utils.MediaInfo;
 
 public class QuickCoderProvider extends ConvertProvider {
 	private static Logger logger = Logger.getLogger(QuickCoderProvider.class);
@@ -209,7 +208,15 @@ public class QuickCoderProvider extends ConvertProvider {
 	@Override
 	public long getLogicLength(DiskFile diskFile) {
 		if (diskFile.isVideo()) {
-			return MediaInfoUtils.getDuration(mediaInfoPath, diskFile);
+			MediaInfo mediaInfo;
+			try {
+				mediaInfo = new MediaInfo(new File(mediaInfoPath), diskFile);
+				return mediaInfo.getVideoInfo().getDuration();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
 		}
 		if (diskFile.getName().endsWith("pdf")) {
 			return DocumentUtils.documentCount(diskFile);
@@ -281,8 +288,8 @@ public class QuickCoderProvider extends ConvertProvider {
 		}
 		OpenOfficeTools openOfficeTools = null;
 		try {
-			openOfficeTools = OpenOfficeTools.getInstance(openOfficeHome);
-		} catch (OfficeException exception) {
+			openOfficeTools = new OpenOfficeTools(openOfficeHome);
+		} catch (Exception exception) {
 			logger.error("启动文档转码服务失败！", exception);
 		}
 
@@ -322,6 +329,13 @@ public class QuickCoderProvider extends ConvertProvider {
 		} catch (Exception e) {
 			logger.debug(e.getMessage());
 		}
+	}
+
+	@Override
+	public void transcodeAudio(DiskFile diskFile, DiskFile destFile,
+			int audioBitrate, TranscodeEvent transcodeEvent) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

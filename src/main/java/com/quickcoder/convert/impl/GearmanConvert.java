@@ -29,10 +29,6 @@ import com.boful.convert.model.DiskFile;
  * 
  */
 public class GearmanConvert implements GearmanJobEventCallback<String> {
-
-	/***
-	 * 
-	 */
 	private static Logger logger = Logger.getLogger(GearmanConvert.class);
 	private static GearmanClient client;
 	private static Gearman gearman;
@@ -93,7 +89,7 @@ public class GearmanConvert implements GearmanJobEventCallback<String> {
 
 	/***
 	 * 加入转码任务
-	 * s
+	 * 
 	 * @param cmd
 	 *            转码命令
 	 * @param jobId

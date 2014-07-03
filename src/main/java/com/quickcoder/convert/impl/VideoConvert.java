@@ -7,9 +7,9 @@ import java.io.IOException;
 import org.apache.log4j.Logger;
 
 import com.boful.convert.core.TranscodeEvent;
+import com.boful.convert.core.impl.utils.FFMpegUtils;
+import com.boful.convert.core.impl.utils.MencoderUtils;
 import com.boful.convert.model.DiskFile;
-import com.boful.convert.utils.FFMpegUtils;
-import com.boful.convert.utils.MencoderUtils;
 
 class VideoConvert {
 
