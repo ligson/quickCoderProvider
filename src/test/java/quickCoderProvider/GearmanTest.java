@@ -9,14 +9,14 @@ import com.quickcoder.convert.impl.QuickCoderProvider;
 public class GearmanTest {
 	public static void main(String[] args) throws Exception {
 		ConvertProviderConfig config = new ConvertProviderConfig();
-		File file=new File("/home/lvy6/.boful/convertServer/convert.xml");
+		File file=new File("/home/ligson/.boful/convertServer/convert.xml");
 		try {
 			config.init(file);
 		} catch (Exception e) {
 			// TODO: handle exception
 		}
 		QuickCoderProvider quickCoderProvider = new QuickCoderProvider(config);
-		String filePath="/home/lvy6/视频/163fd1d6fa36758dca662c7341254572.mp4";
+		String filePath="/home/ligson/1/1.avi";
 		DiskFile diskFile=new DiskFile(filePath);
 		DiskFile destFile=new DiskFile("/home/lvy6/视频/163fd1d6fa36758dca662c7341254572_cp.mp4");
 		quickCoderProvider.transcodeVideo(diskFile, destFile,null);
