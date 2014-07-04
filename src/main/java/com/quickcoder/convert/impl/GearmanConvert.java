@@ -201,7 +201,7 @@ public class GearmanConvert implements GearmanJobEventCallback<String> {
 		GearmanJobEventType eventType = event.getEventType();
 		if (eventType == GearmanJobEventType.GEARMAN_JOB_SUCCESS) {
 			// System.out.println("GEARMAN_JOB_SUCCESS");
-			transcodeEvent.onSubmitSuccess(diskFile);
+			transcodeEvent.onTranscodeSuccess(diskFile);
 		} else if (eventType == GearmanJobEventType.GEARMAN_SUBMIT_FAIL) {
 			// System.out.println("GEARMAN_SUBMIT_FAIL");
 			transcodeEvent.onSubmitFail(diskFile, "GEARMAN_SUBMIT_FAIL");
