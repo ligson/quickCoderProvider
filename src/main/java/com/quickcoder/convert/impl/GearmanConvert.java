@@ -42,14 +42,15 @@ public class GearmanConvert implements GearmanJobEventCallback<String> {
 	private String memcachedAddress;
 	private int memcachedPort;
 	private TranscodeEvent transcodeEvent;
-	
-	private Map<String, String> jobMap = new HashMap<String,String>();
+
+	private Map<String, String> jobMap = new HashMap<String, String>();
 
 	public GearmanConvert() {
 		// TODO Auto-generated constructor stub
 	}
 
-	GearmanConvert(QuickCoderProvider quickCoderProvider,TranscodeEvent transcodeEvent) {
+	GearmanConvert(QuickCoderProvider quickCoderProvider,
+			TranscodeEvent transcodeEvent) {
 		this.transcodeEvent = transcodeEvent;
 		init(quickCoderProvider);
 	}
@@ -136,11 +137,10 @@ public class GearmanConvert implements GearmanJobEventCallback<String> {
 	 *            转码事件
 	 * @throws Exception
 	 */
-	void gearmanTranscode(DiskFile diskFile, DiskFile destFile,
-			int width, int height, int videoBitrate, int audioBitrate
-			) throws Exception {
+	void gearmanTranscode(DiskFile diskFile, DiskFile destFile, int width,
+			int height, int videoBitrate, int audioBitrate) throws Exception {
 		String jobId = UUID.randomUUID().toString();
-		String filePath =diskFile.getAbsolutePath();
+		String filePath = diskFile.getAbsolutePath();
 		jobMap.put(jobId, filePath);
 		StringBuffer cmd = new StringBuffer();
 		// ##############################拼接文件路径开始#################################
@@ -195,39 +195,40 @@ public class GearmanConvert implements GearmanJobEventCallback<String> {
 
 	@Override
 	public void onEvent(String str, GearmanJobEvent event) {
-		//System.out.println(new String(str) + ":");
+		// System.out.println(new String(str) + ":");
 		displayEvent(str, event);
 	}
 
 	private void displayEvent(String str, GearmanJobEvent event) {
 		DiskFile diskFile = null;
-		if(jobMap.size()>0){
+		if (jobMap.size() > 0) {
 			String filePath = jobMap.get(str);
 			diskFile = new DiskFile(filePath);
 		}
 		GearmanJobEventType eventType = event.getEventType();
 		if (eventType == GearmanJobEventType.GEARMAN_JOB_SUCCESS) {
-			//System.out.println("GEARMAN_JOB_SUCCESS");
+			// System.out.println("GEARMAN_JOB_SUCCESS");
 			transcodeEvent.onSubmitSuccess(diskFile);
 		} else if (eventType == GearmanJobEventType.GEARMAN_SUBMIT_FAIL) {
-			//System.out.println("GEARMAN_SUBMIT_FAIL");
+			// System.out.println("GEARMAN_SUBMIT_FAIL");
 			transcodeEvent.onSubmitFail(diskFile, "GEARMAN_SUBMIT_FAIL");
 			shutdown();
 		} else if (eventType == GearmanJobEventType.GEARMAN_JOB_FAIL) {
-			//System.out.println("GEARMAN_JOB_FAIL");
-			transcodeEvent.onTranscodeFail(diskFile,"GEARMAN_JOB_FAIL");
+			// System.out.println("GEARMAN_JOB_FAIL");
+			transcodeEvent.onTranscodeFail(diskFile, "GEARMAN_JOB_FAIL");
 			shutdown();
 		} else if (eventType == GearmanJobEventType.GEARMAN_JOB_DATA) {
 			System.out.println("GEARMAN_JOB_DATA");
 		} else if (eventType == GearmanJobEventType.GEARMAN_JOB_WARNING) {
 			System.out.println("GEARMAN_JOB_WARNING");
 		} else if (eventType == GearmanJobEventType.GEARMAN_JOB_STATUS) {
-			//System.out.println("GEARMAN_JOB_STATUS");
+			// System.out.println("GEARMAN_JOB_STATUS");
 			// #######################进度###########################
-			transcodeEvent.onTranscode(diskFile,Integer.parseInt(new String(event.getData())));
+			transcodeEvent.onTranscode(diskFile,
+					Integer.parseInt(new String(event.getData())));
 			System.out.println(new String(event.getData()));
 		} else if (eventType == GearmanJobEventType.GEARMAN_SUBMIT_SUCCESS) {
-			//System.out.println("GEARMAN_SUBMIT_SUCCESS");
+			// System.out.println("GEARMAN_SUBMIT_SUCCESS");
 			transcodeEvent.onSubmitSuccess(diskFile);
 		} else if (eventType == GearmanJobEventType.GEARMAN_EOF) {
 			System.out.println("GEARMAN_EOF");
