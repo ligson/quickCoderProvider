@@ -204,7 +204,9 @@ public class QuickCoderProvider extends ConvertProvider {
 		}
 
 	}
-
+	/**
+	 * 获取文件时长
+	 */
 	@Override
 	public long getLogicLength(DiskFile diskFile) {
 		if (diskFile.isVideo()) {
@@ -229,7 +231,9 @@ public class QuickCoderProvider extends ConvertProvider {
 		// TODO Auto-generated method stub
 		return false;
 	}
-
+	/**
+	 * 文件截图
+	 */
 	@Override
 	public void screenshot(DiskFile src, int width, int height, int position,
 			DiskFile dest) throws Exception {
@@ -275,7 +279,9 @@ public class QuickCoderProvider extends ConvertProvider {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
+	/**
+	 * 文档转码
+	 */
 	@Override
 	public void transcode2PDF(DiskFile diskFile, DiskFile destFile,
 			TranscodeEvent transcodeEvent) {
@@ -300,7 +306,9 @@ public class QuickCoderProvider extends ConvertProvider {
 		}
 
 	}
-
+	/**
+	 * 文档转码
+	 */
 	@Override
 	public void transcode2SWF(DiskFile srcFile, DiskFile destFile,
 			TranscodeEvent transcodeEvent) {
@@ -313,12 +321,16 @@ public class QuickCoderProvider extends ConvertProvider {
 			}
 		}
 	}
-
+	/**
+	 * 视频转码
+	 */
 	public void transcodeVideo(DiskFile diskFile, DiskFile destFile,
 			TranscodeEvent transcodeEvent) {
 		super.transcodeVideo(diskFile, destFile, transcodeEvent);
 	}
-
+	/**
+	 * 视频转码
+	 */
 	@Override
 	public void transcodeVideo(DiskFile diskFile, DiskFile destFile, int width,
 			int height, int videoBitrate, int audioBitrate,
@@ -330,7 +342,9 @@ public class QuickCoderProvider extends ConvertProvider {
 			logger.debug(e.getMessage());
 		}
 	}
-
+	/**
+	 * 音频转码
+	 */
 	@Override
 	public void transcodeAudio(DiskFile diskFile, DiskFile destFile,
 			int audioBitrate, TranscodeEvent transcodeEvent) {
