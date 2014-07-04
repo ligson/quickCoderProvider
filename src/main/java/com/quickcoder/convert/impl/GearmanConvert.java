@@ -146,30 +146,23 @@ public class GearmanConvert implements GearmanJobEventCallback<String> {
 		// ##############################拼接文件路径开始#################################
 		cmd.append(" -i ftp://" + ftpUserName + ":" + ftpUserPassword + "@"
 				+ ftpHost + ":" + ftpPort);
-		// 判断传递过来的文件是否以"ftpUserHome"属性值开头
+		// 判断传递过来的文件是否以"ftpUserHome"属性值开头,以"ftpUserHome"属性值开头替换为空
 		if (diskFile.getParentFile().getAbsolutePath().startsWith(ftpUserHome)) {
-			cmd.append(diskFile.getAbsolutePath());
+			String subName =diskFile.getAbsolutePath().replaceAll(ftpUserHome, "");
+			cmd.append(subName);
 		} else {
-			String subName = diskFile.getAbsolutePath().substring(
-					diskFile.getParentFile().getAbsolutePath().length(),
-					diskFile.getAbsolutePath().length());
-			cmd.append(ftpUserHome + subName);
+			cmd.append(diskFile.getAbsolutePath());
 		}
 		// ##############################拼接文件路径结束#################################
 		// ##############################拼接输出路径开始#################################
 		cmd.append(" -o ftp://" + ftpUserName + ":" + ftpUserPassword + "@"
 				+ ftpHost + ":" + ftpPort);
-		// 判断传递过来的文件是否以"ftpUserHome"属性值开头
+		// 判断传递过来的文件是否以"ftpUserHome"属性值开头,以"ftpUserHome"属性值开头替换为空
 		if (destFile.getParentFile().getAbsolutePath().startsWith(ftpUserHome)) {
-			cmd.append(destFile.getAbsolutePath());
+			String subName =destFile.getAbsolutePath().replaceAll(ftpUserHome, "");
+			cmd.append(subName);
 		} else {
-			String subName = destFile.getAbsolutePath().substring(
-					destFile.getParentFile().getAbsolutePath().length(),
-					destFile.getAbsolutePath().length());
-			// ################修改文件名称###########################
-			String newName = FileUtils.getFilePrefix(subName) + "_cp";
-			String fileType = FileUtils.getFileSufix(subName);
-			cmd.append(ftpUserHome + newName + "." + fileType);
+			cmd.append(destFile.getAbsolutePath());
 		}
 		// ##############################拼接输出路径结束#################################
 		cmd.append(" -guid " + jobId);

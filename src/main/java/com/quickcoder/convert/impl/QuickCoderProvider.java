@@ -175,7 +175,7 @@ public class QuickCoderProvider extends ConvertProvider {
 	 * 为BofulConvertProvider对象赋值
 	 * 
 	 * @param params
-	 * @return BofulConvertProvider对象
+	 * 
 	 */
 	public void voluation(Map<String, String> params) throws Exception {
 		Class<?> cls = this.getClass();
