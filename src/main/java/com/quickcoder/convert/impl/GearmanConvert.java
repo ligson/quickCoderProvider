@@ -1,15 +1,9 @@
 package com.quickcoder.convert.impl;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 import java.util.UUID;
 
-import org.apache.commons.net.nntp.NewGroupsOrNewsQuery;
 import org.apache.log4j.Logger;
 import org.gearman.Gearman;
 import org.gearman.GearmanClient;
@@ -19,8 +13,6 @@ import org.gearman.GearmanJobEventType;
 import org.gearman.GearmanJoin;
 import org.gearman.GearmanServer;
 
-import com.boful.common.file.utils.FileUtils;
-import com.boful.convert.core.ConvertProviderConfig;
 import com.boful.convert.core.TranscodeEvent;
 import com.boful.convert.model.DiskFile;
 
