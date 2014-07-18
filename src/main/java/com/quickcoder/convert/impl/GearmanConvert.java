@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.UUID;
 
+import org.apache.commons.net.nntp.NewGroupsOrNewsQuery;
 import org.apache.log4j.Logger;
 import org.gearman.Gearman;
 import org.gearman.GearmanClient;
@@ -148,7 +149,7 @@ public class GearmanConvert implements GearmanJobEventCallback<String> {
 				+ ftpHost + ":" + ftpPort);
 		// 判断传递过来的文件是否以"ftpUserHome"属性值开头,以"ftpUserHome"属性值开头替换为空
 		if (diskFile.getParentFile().getAbsolutePath().startsWith(ftpUserHome)) {
-			String subName =diskFile.getAbsolutePath().replaceAll(ftpUserHome, "");
+			String subName =diskFile.getAbsolutePath().replaceFirst(ftpUserHome, "");
 			cmd.append(subName);
 		} else {
 			cmd.append(diskFile.getAbsolutePath());
@@ -159,7 +160,7 @@ public class GearmanConvert implements GearmanJobEventCallback<String> {
 				+ ftpHost + ":" + ftpPort);
 		// 判断传递过来的文件是否以"ftpUserHome"属性值开头,以"ftpUserHome"属性值开头替换为空
 		if (destFile.getParentFile().getAbsolutePath().startsWith(ftpUserHome)) {
-			String subName =destFile.getAbsolutePath().replaceAll(ftpUserHome, "");
+			String subName =destFile.getAbsolutePath().replaceFirst(ftpUserHome, "");
 			cmd.append(subName);
 		} else {
 			cmd.append(destFile.getAbsolutePath());
