@@ -10,10 +10,10 @@ import org.apache.log4j.Logger;
 import com.boful.convert.core.ConvertProvider;
 import com.boful.convert.core.ConvertProviderConfig;
 import com.boful.convert.core.TranscodeEvent;
+import com.boful.convert.core.impl.DocConvert;
 import com.boful.convert.core.impl.utils.DocumentUtils;
 import com.boful.convert.core.impl.utils.FFMpegUtils;
 import com.boful.convert.core.impl.utils.ImageMagickUtils;
-import com.boful.convert.core.impl.utils.OpenOfficeTools;
 import com.boful.convert.core.impl.utils.SwfTools;
 import com.boful.convert.model.DiskFile;
 import com.boful.convert.utils.MediaInfo;
@@ -24,7 +24,6 @@ public class QuickCoderProvider extends ConvertProvider {
 	private String ffmpegPath;
 	private String imageMagickSearchPath;
 	private String transcodeDocumentEnable;
-	private String openOfficeHome;
 	private String pdf2swfPath;
 	private String ftpUserName;
 	private String ftpUserPassword;
@@ -35,6 +34,7 @@ public class QuickCoderProvider extends ConvertProvider {
 	private int transcodeSvrPort;
 	private String memcachedAddress;
 	private int memcachedPort;
+	private String unoconvPath;
 
 	public String getMediaInfoPath() {
 		return mediaInfoPath;
@@ -68,12 +68,12 @@ public class QuickCoderProvider extends ConvertProvider {
 		this.transcodeDocumentEnable = transcodeDocumentEnable;
 	}
 
-	public String getOpenOfficeHome() {
-		return openOfficeHome;
+	public String getUnoconvPath() {
+		return unoconvPath;
 	}
 
-	public void setOpenOfficeHome(String openOfficeHome) {
-		this.openOfficeHome = openOfficeHome;
+	public void setUnoconvPath(String unoconvPath) {
+		this.unoconvPath = unoconvPath;
 	}
 
 	public String getPdf2swfPath() {
@@ -294,18 +294,8 @@ public class QuickCoderProvider extends ConvertProvider {
 			}
 			return;
 		}
-		OpenOfficeTools openOfficeTools = null;
-		try {
-			openOfficeTools = new OpenOfficeTools(openOfficeHome);
-		} catch (Exception exception) {
-			logger.error("启动文档转码服务失败！", exception);
-		}
-
-		if (openOfficeTools != null) {
-			openOfficeTools.convert2PDF(diskFile, destFile, transcodeEvent);
-		} else {
-			logger.error("文档转码服务未正常启动！");
-		}
+		DocConvert convert = new DocConvert(getUnoconvPath());
+		convert.convert(diskFile, destFile, transcodeEvent);
 
 	}
 
