@@ -1,10 +1,4 @@
-/home/ligson/workspace/code/eclipse/code/eclipse/boful/quickCoderProvider/src/main/java/com/quickcoder/convert/impl/VideoConvert.java
-/home/ligson/workspace/code/eclipse/code/eclipse/boful/quickCoderProvider/src/main/java/com/boful/convert/utils/MencoderUtils.java
-/home/ligson/workspace/code/eclipse/code/eclipse/boful/quickCoderProvider/src/main/java/com/quickcoder/convert/impl/GearmanConvert.java
-/home/ligson/workspace/code/eclipse/code/eclipse/boful/quickCoderProvider/src/main/java/com/boful/convert/utils/MediaInfoUtils.java
-/home/ligson/workspace/code/eclipse/code/eclipse/boful/quickCoderProvider/src/main/java/com/boful/convert/utils/FFMpegUtils.java
-/home/ligson/workspace/code/eclipse/code/eclipse/boful/quickCoderProvider/src/main/java/com/boful/convert/utils/DocumentUtils.java
-/home/ligson/workspace/code/eclipse/code/eclipse/boful/quickCoderProvider/src/main/java/com/boful/convert/utils/SwfTools.java
-/home/ligson/workspace/code/eclipse/code/eclipse/boful/quickCoderProvider/src/main/java/com/quickcoder/convert/impl/QuickCoderProvider.java
-/home/ligson/workspace/code/eclipse/code/eclipse/boful/quickCoderProvider/src/main/java/com/boful/convert/utils/OpenOfficeTools.java
-/home/ligson/workspace/code/eclipse/code/eclipse/boful/quickCoderProvider/src/main/java/com/boful/convert/utils/ImageMagickUtils.java
+I:\coderepos\svn\quickCoderProvider\src\main\java\com\quickcoder\convert\impl\GearmanConvert.java
+I:\coderepos\svn\quickCoderProvider\src\main\java\com\quickcoder\convert\impl\MyTranscodeEvent.java
+I:\coderepos\svn\quickCoderProvider\src\main\java\com\quickcoder\convert\impl\QuickCoderProvider.java
+I:\coderepos\svn\quickCoderProvider\src\main\java\com\quickcoder\convert\impl\MyConvert.java
