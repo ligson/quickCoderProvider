@@ -32,6 +32,7 @@ public class GearmanEvent implements TranscodeEvent{
 	@Override
 	public void onTranscode(DiskFile diskFile, int process) {
 		// TODO Auto-generated method stub
+		System.out.println("==================================================");
 		System.out.println(process);
 		
 	}

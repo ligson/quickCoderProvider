@@ -1,8 +1,12 @@
 package com.quickcoder.convert.impl;
 
+import java.io.UnsupportedEncodingException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 import org.gearman.Gearman;
@@ -214,9 +218,21 @@ public class GearmanConvert implements GearmanJobEventCallback<String> {
 		} else if (eventType == GearmanJobEventType.GEARMAN_JOB_STATUS) {
 			// System.out.println("GEARMAN_JOB_STATUS");
 			// #######################进度###########################
-			transcodeEvent.onTranscode(diskFile,
-					Integer.parseInt(new String(event.getData())));
-			System.out.println(new String(event.getData()));
+			String processString = null;
+			try {
+				System.out.println(Arrays.toString(event.getData()));
+				processString = new String(event.getData(),"UTF-8").trim();
+				Pattern pattern = Pattern.compile("\\d+");
+				Matcher matcher = pattern.matcher(processString);
+				if(matcher.find()){
+					processString = matcher.group();
+				}
+			} catch (UnsupportedEncodingException e1) {
+				e1.printStackTrace();
+			}
+			int process = Integer.parseInt(processString);
+			transcodeEvent.onTranscode(diskFile,process);
+			
 		} else if (eventType == GearmanJobEventType.GEARMAN_SUBMIT_SUCCESS) {
 			// System.out.println("GEARMAN_SUBMIT_SUCCESS");
 			transcodeEvent.onSubmitSuccess(diskFile);

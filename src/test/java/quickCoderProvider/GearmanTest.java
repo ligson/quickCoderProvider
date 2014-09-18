@@ -11,7 +11,7 @@ import com.quickcoder.convert.impl.QuickCoderProvider;
 public class GearmanTest {
 	public static void main(String[] args) throws Exception {
 		ConvertProviderConfig config = new ConvertProviderConfig();
-		File file=new File("I:/coderepos/svn/quickCoderProvider/src/main/resources/convert.xml");
+		File file=new File("/home/ligson/workspace/code/eclipse/code/eclipse/boful/quickCoderProvider/src/main/resources/convert.xml");
 		try {
 			config.init(file);
 		} catch (Exception e) {
