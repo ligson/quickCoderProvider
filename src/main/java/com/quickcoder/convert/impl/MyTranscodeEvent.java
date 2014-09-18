@@ -24,7 +24,7 @@ public class MyTranscodeEvent implements TranscodeEvent{
 	}
 
 	@Override
-	public void onTranscodeSuccess(DiskFile diskFile) {
+	public void onTranscodeSuccess(DiskFile diskFile,DiskFile destFile) {
 		// TODO Auto-generated method stub
 		System.out.println(diskFile + "转码转码成功");
 	}

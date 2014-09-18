@@ -135,13 +135,15 @@ public class GearmanConvert implements GearmanJobEventCallback<String> {
 		String jobId = UUID.randomUUID().toString();
 		String filePath = diskFile.getAbsolutePath();
 		jobMap.put(jobId, filePath);
+		jobMap.put(jobId + "-destFile", destFile.getAbsolutePath());
 		StringBuffer cmd = new StringBuffer();
 		// ##############################拼接文件路径开始#################################
 		cmd.append(" -i ftp://" + ftpUserName + ":" + ftpUserPassword + "@"
 				+ ftpHost + ":" + ftpPort);
 		// 判断传递过来的文件是否以"ftpUserHome"属性值开头,以"ftpUserHome"属性值开头替换为空
 		if (diskFile.getParentFile().getAbsolutePath().startsWith(ftpUserHome)) {
-			String subName =diskFile.getAbsolutePath().replaceFirst(ftpUserHome, "");
+			String subName = diskFile.getAbsolutePath().replaceFirst(
+					ftpUserHome, "");
 			cmd.append(subName);
 		} else {
 			cmd.append(diskFile.getAbsolutePath());
@@ -152,7 +154,8 @@ public class GearmanConvert implements GearmanJobEventCallback<String> {
 				+ ftpHost + ":" + ftpPort);
 		// 判断传递过来的文件是否以"ftpUserHome"属性值开头,以"ftpUserHome"属性值开头替换为空
 		if (destFile.getParentFile().getAbsolutePath().startsWith(ftpUserHome)) {
-			String subName =destFile.getAbsolutePath().replaceFirst(ftpUserHome, "");
+			String subName = destFile.getAbsolutePath().replaceFirst(
+					ftpUserHome, "");
 			cmd.append(subName);
 		} else {
 			cmd.append(destFile.getAbsolutePath());
@@ -194,7 +197,8 @@ public class GearmanConvert implements GearmanJobEventCallback<String> {
 		GearmanJobEventType eventType = event.getEventType();
 		if (eventType == GearmanJobEventType.GEARMAN_JOB_SUCCESS) {
 			// System.out.println("GEARMAN_JOB_SUCCESS");
-			transcodeEvent.onTranscodeSuccess(diskFile);
+			String destFile = jobMap.get(str + "-destFile");
+			transcodeEvent.onTranscodeSuccess(diskFile, new DiskFile(destFile));
 		} else if (eventType == GearmanJobEventType.GEARMAN_SUBMIT_FAIL) {
 			// System.out.println("GEARMAN_SUBMIT_FAIL");
 			transcodeEvent.onSubmitFail(diskFile, "GEARMAN_SUBMIT_FAIL");
