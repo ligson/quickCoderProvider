@@ -286,16 +286,16 @@ public class QuickCoderProvider extends ConvertProvider {
 	 */
 	@Override
 	public void transcode2PDF(DiskFile diskFile, DiskFile destFile,
-			TranscodeEvent transcodeEvent) {
+			TranscodeEvent transcodeEvent,String jobId) {
 		// TODO Auto-generated method stub
 		if ("false".equals(getTranscodeDocumentEnable())) {
 			if (transcodeEvent != null) {
-				transcodeEvent.onTranscodeFail(diskFile, "文档转码服务未启用！");
+				transcodeEvent.onTranscodeFail(diskFile, "文档转码服务未启用！",jobId);
 			}
 			return;
 		}
 		DocConvert convert = new DocConvert(getUnoconvPath());
-		convert.convert(diskFile, destFile, transcodeEvent);
+		convert.convert(diskFile, destFile, transcodeEvent,jobId);
 
 	}
 
@@ -304,13 +304,13 @@ public class QuickCoderProvider extends ConvertProvider {
 	 */
 	@Override
 	public void transcode2SWF(DiskFile srcFile, DiskFile destFile,
-			TranscodeEvent transcodeEvent) {
+			TranscodeEvent transcodeEvent,String jobId) {
 		if (srcFile != null && srcFile.exists()
 				&& srcFile.getAbsolutePath().endsWith("pdf")) {
-			SwfTools.transcode(pdf2swfPath, srcFile, destFile, transcodeEvent);
+			SwfTools.transcode(pdf2swfPath, srcFile, destFile, transcodeEvent,jobId);
 		} else {
 			if (transcodeEvent != null) {
-				transcodeEvent.onTranscodeFail(srcFile, "不是pdf文件！");
+				transcodeEvent.onTranscodeFail(srcFile, "不是pdf文件！",jobId);
 			}
 		}
 	}
@@ -319,8 +319,8 @@ public class QuickCoderProvider extends ConvertProvider {
 	 * 视频转码
 	 */
 	public void transcodeVideo(DiskFile diskFile, DiskFile destFile,
-			TranscodeEvent transcodeEvent) {
-		super.transcodeVideo(diskFile, destFile, transcodeEvent);
+			TranscodeEvent transcodeEvent,String jobId) {
+		super.transcodeVideo(diskFile, destFile, transcodeEvent,jobId);
 	}
 
 	/**
@@ -329,7 +329,7 @@ public class QuickCoderProvider extends ConvertProvider {
 	@Override
 	public void transcodeVideo(DiskFile diskFile, DiskFile destFile, int width,
 			int height, int videoBitrate, int audioBitrate,
-			TranscodeEvent transcodeEvent) {
+			TranscodeEvent transcodeEvent,String jobId) {
 		try {
 			GearmanConvert convert = new GearmanConvert(this, transcodeEvent);
 			convert.gearmanTranscode(diskFile, destFile, width, height,
@@ -344,7 +344,7 @@ public class QuickCoderProvider extends ConvertProvider {
 	 */
 	@Override
 	public void transcodeAudio(DiskFile diskFile, DiskFile destFile,
-			int audioBitrate, TranscodeEvent transcodeEvent) {
+			int audioBitrate, TranscodeEvent transcodeEvent,String jobId) {
 		// TODO Auto-generated method stub
 
 	}

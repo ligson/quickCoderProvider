@@ -6,41 +6,44 @@ import com.boful.convert.model.DiskFile;
 public class GearmanEvent implements TranscodeEvent{
 
 	@Override
-	public void onSubmitFail(DiskFile diskFile, String errorMessage) {
+	public void onSubmitFail(DiskFile diskFile, String errorMessage,
+			String jobId) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void onSubmitSuccess(DiskFile diskFile) {
+	public void onSubmitSuccess(DiskFile diskFile, String jobId) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void onStartTranscode(DiskFile diskFile) {
+	public void onStartTranscode(DiskFile diskFile, String jobId) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void onTranscodeSuccess(DiskFile diskFile, DiskFile destFile) {
+	public void onTranscodeSuccess(DiskFile diskFile, DiskFile destFile,
+			String jobId) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void onTranscode(DiskFile diskFile, int process) {
+	public void onTranscode(DiskFile diskFile, int process, String jobId) {
 		// TODO Auto-generated method stub
-		System.out.println("==================================================");
-		System.out.println(process);
 		
 	}
 
 	@Override
-	public void onTranscodeFail(DiskFile diskFile, String errorMessage) {
+	public void onTranscodeFail(DiskFile diskFile, String errorMessage,
+			String jobId) {
 		// TODO Auto-generated method stub
 		
 	}
+
+	
 
 }

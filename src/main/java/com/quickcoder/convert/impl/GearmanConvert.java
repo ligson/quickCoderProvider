@@ -202,14 +202,14 @@ public class GearmanConvert implements GearmanJobEventCallback<String> {
 		if (eventType == GearmanJobEventType.GEARMAN_JOB_SUCCESS) {
 			// System.out.println("GEARMAN_JOB_SUCCESS");
 			String destFile = jobMap.get(str + "-destFile");
-			transcodeEvent.onTranscodeSuccess(diskFile, new DiskFile(destFile));
+			transcodeEvent.onTranscodeSuccess(diskFile, new DiskFile(destFile),str);
 		} else if (eventType == GearmanJobEventType.GEARMAN_SUBMIT_FAIL) {
 			// System.out.println("GEARMAN_SUBMIT_FAIL");
-			transcodeEvent.onSubmitFail(diskFile, "GEARMAN_SUBMIT_FAIL");
+			transcodeEvent.onSubmitFail(diskFile, "GEARMAN_SUBMIT_FAIL",str);
 			shutdown();
 		} else if (eventType == GearmanJobEventType.GEARMAN_JOB_FAIL) {
 			// System.out.println("GEARMAN_JOB_FAIL");
-			transcodeEvent.onTranscodeFail(diskFile, "GEARMAN_JOB_FAIL");
+			transcodeEvent.onTranscodeFail(diskFile, "GEARMAN_JOB_FAIL",str);
 			shutdown();
 		} else if (eventType == GearmanJobEventType.GEARMAN_JOB_DATA) {
 			System.out.println("GEARMAN_JOB_DATA");
@@ -231,11 +231,11 @@ public class GearmanConvert implements GearmanJobEventCallback<String> {
 				e1.printStackTrace();
 			}
 			int process = Integer.parseInt(processString);
-			transcodeEvent.onTranscode(diskFile,process);
+			transcodeEvent.onTranscode(diskFile,process,str);
 			
 		} else if (eventType == GearmanJobEventType.GEARMAN_SUBMIT_SUCCESS) {
 			// System.out.println("GEARMAN_SUBMIT_SUCCESS");
-			transcodeEvent.onSubmitSuccess(diskFile);
+			transcodeEvent.onSubmitSuccess(diskFile,str);
 		} else if (eventType == GearmanJobEventType.GEARMAN_EOF) {
 			System.out.println("GEARMAN_EOF");
 			shutdown();

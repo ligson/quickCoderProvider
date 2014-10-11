@@ -6,39 +6,44 @@ import com.boful.convert.model.DiskFile;
 public class MyTranscodeEvent implements TranscodeEvent{
 
 	@Override
-	public void onSubmitFail(DiskFile diskFile, String errorMessage) {
+	public void onSubmitFail(DiskFile diskFile, String errorMessage,
+			String jobId) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void onSubmitSuccess(DiskFile diskFile) {
+	public void onSubmitSuccess(DiskFile diskFile, String jobId) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void onStartTranscode(DiskFile diskFile) {
+	public void onStartTranscode(DiskFile diskFile, String jobId) {
 		// TODO Auto-generated method stub
-		System.out.println(diskFile + "开始转码");
+		
 	}
 
 	@Override
-	public void onTranscodeSuccess(DiskFile diskFile,DiskFile destFile) {
+	public void onTranscodeSuccess(DiskFile diskFile, DiskFile destFile,
+			String jobId) {
 		// TODO Auto-generated method stub
-		System.out.println(diskFile + "转码转码成功");
+		
 	}
 
 	@Override
-	public void onTranscode(DiskFile diskFile, int process) {
+	public void onTranscode(DiskFile diskFile, int process, String jobId) {
 		// TODO Auto-generated method stub
-		System.out.println(diskFile.getName() + ":" + process);
+		
 	}
 
 	@Override
-	public void onTranscodeFail(DiskFile diskFile, String errorMessage) {
+	public void onTranscodeFail(DiskFile diskFile, String errorMessage,
+			String jobId) {
 		// TODO Auto-generated method stub
-		System.out.println(diskFile.getName() + ":" + errorMessage);
+		
 	}
+
+
 
 }
