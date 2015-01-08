@@ -34,7 +34,7 @@ public class QuickCoderProvider extends ConvertProvider {
 	private int transcodeSvrPort;
 	private String memcachedAddress;
 	private int memcachedPort;
-	private String unoconvPath;
+	private String sofficePath;
 
 	public String getMediaInfoPath() {
 		return mediaInfoPath;
@@ -68,12 +68,12 @@ public class QuickCoderProvider extends ConvertProvider {
 		this.transcodeDocumentEnable = transcodeDocumentEnable;
 	}
 
-	public String getUnoconvPath() {
-		return unoconvPath;
+	public String getSofficePath() {
+		return sofficePath;
 	}
 
-	public void setUnoconvPath(String unoconvPath) {
-		this.unoconvPath = unoconvPath;
+	public void setSofficePath(String sofficePath) {
+		this.sofficePath = sofficePath;
 	}
 
 	public String getPdf2swfPath() {
@@ -294,7 +294,7 @@ public class QuickCoderProvider extends ConvertProvider {
 			}
 			return;
 		}
-		DocConvert convert = new DocConvert(getUnoconvPath());
+		DocConvert convert = new DocConvert(getSofficePath());
 		convert.convert(diskFile, destFile, transcodeEvent,jobId);
 
 	}
@@ -333,7 +333,7 @@ public class QuickCoderProvider extends ConvertProvider {
 		try {
 			GearmanConvert convert = new GearmanConvert(this, transcodeEvent);
 			convert.gearmanTranscode(diskFile, destFile, width, height,
-					videoBitrate, audioBitrate);
+					videoBitrate*1024, audioBitrate*1024,jobId);
 		} catch (Exception e) {
 			logger.debug(e.getMessage());
 		}

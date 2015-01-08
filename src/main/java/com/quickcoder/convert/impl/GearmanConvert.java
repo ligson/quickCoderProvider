@@ -135,8 +135,9 @@ public class GearmanConvert implements GearmanJobEventCallback<String> {
 	 * @throws Exception
 	 */
 	void gearmanTranscode(DiskFile diskFile, DiskFile destFile, int width,
-			int height, int videoBitrate, int audioBitrate) throws Exception {
-		String jobId = UUID.randomUUID().toString();
+			int height, int videoBitrate, int audioBitrate,String jobId) throws Exception {
+		System.out.print("加入成功");
+		System.out.print("jobId:"+jobId);
 		String filePath = diskFile.getAbsolutePath();
 		jobMap.put(jobId, filePath);
 		jobMap.put(jobId + "-destFile", destFile.getAbsolutePath());
@@ -193,14 +194,16 @@ public class GearmanConvert implements GearmanJobEventCallback<String> {
 	}
 
 	private void displayEvent(String str, GearmanJobEvent event) {
+		
 		DiskFile diskFile = null;
 		if (jobMap.size() > 0) {
 			String filePath = jobMap.get(str);
 			diskFile = new DiskFile(filePath);
 		}
 		GearmanJobEventType eventType = event.getEventType();
+		System.out.println(eventType);
 		if (eventType == GearmanJobEventType.GEARMAN_JOB_SUCCESS) {
-			// System.out.println("GEARMAN_JOB_SUCCESS");
+			System.out.println("GEARMAN_JOB_SUCCESS");
 			String destFile = jobMap.get(str + "-destFile");
 			transcodeEvent.onTranscodeSuccess(diskFile, new DiskFile(destFile),str);
 		} else if (eventType == GearmanJobEventType.GEARMAN_SUBMIT_FAIL) {
